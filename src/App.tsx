@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/layout";
-import AdminFoods from "./views/admin/foods";
+import AdminFoods from "./views/admin";
 import ClientFoods from "./views/client/foods";
 
 function App() {
