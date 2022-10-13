@@ -4,33 +4,39 @@ import Row from "react-bootstrap/Row";
 import Tab from "react-bootstrap/Tab";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../style.css";
 import Categories from "../categories";
 import Form from "react-bootstrap/Form";
 import { useEffect, useState } from "react";
 import { ITypeFoods } from "../../../model/common.model";
-import { API_URL_DEV } from "../../../env/environment.dev";
+import { API_UPLOAD_IMG, API_URL_DEV } from "../../../env/environment.dev";
 import { SpinnerRoundOutlined } from "spinners-react";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
-import { IPayloadCreateFood } from "../../../model/admin.model";
+import { IPayloadCreateFood, IResUploadFile } from "../../../model/admin.model";
 
 export default function AddFood() {
   const [typeFoods, setTypeFoods] = useState<ITypeFoods[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingCreate, setIsLoadingCreate] = useState<boolean>(false);
   const [payload, setPayload] = useState<IPayloadCreateFood>({
     typeProduct: "",
     nameFood: "",
     typeFood: "",
-    price: 0,
-    amount: 0,
+    price: "",
+    amount: "",
     description: "",
     imgUrl: "",
   });
+  const [fileUpload, setFileUpload] = useState<any | null>(null);
   const { typeProduct } = payload;
+  const navigate = useNavigate();
   useEffect(() => {
+    const controller = new AbortController();
     setIsLoading(true);
-    fetch(`${API_URL_DEV}/typeFoods`)
+    fetch(`${API_URL_DEV}/typeFoods`, {
+      signal: controller.signal,
+    })
       .then((response) => response.json())
       .then((data: ITypeFoods[]) => {
         setIsLoading(false);
@@ -40,10 +46,51 @@ export default function AddFood() {
         console.log(error);
         setIsLoading(false);
       });
+    return () => controller.abort();
   }, []);
   const onSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("img", fileUpload);
+    setIsLoadingCreate(true);
+    fetch(API_UPLOAD_IMG, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((res: IResUploadFile) => {
+        setPayload((prevState: IPayloadCreateFood) => ({
+          ...prevState,
+          imgUrl: res.imgLink,
+        }));
+        setIsLoadingCreate(false);
+        postCreateFood();
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsLoadingCreate(false);
+      });
   };
+
+  function postCreateFood() {
+    setIsLoadingCreate(true);
+    fetch(`${API_URL_DEV}/foods`, {
+      credentials: "same-origin", // 'include', default: 'omit'
+      method: "POST", // 'GET', 'PUT', 'DELETE', etc.
+      body: JSON.stringify(payload), // Use correct payload (matching 'Content-Type')
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        console.log(res);
+        setIsLoadingCreate(false);
+        navigate("/admin");
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsLoadingCreate(false);
+      });
+  }
 
   const handleChangeRadio = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.persist();
@@ -53,6 +100,10 @@ export default function AddFood() {
       typeProduct: e.target.value,
     }));
   };
+
+  function handleChangeUploadFile(event: any) {
+    setFileUpload(event.target?.files?.item(0));
+  }
 
   return (
     <div className="container">
@@ -91,12 +142,29 @@ export default function AddFood() {
                                   type="text"
                                   placeholder="Nhập tên món ăn"
                                   name="nameFood"
+                                  onChange={(e) =>
+                                    setPayload(
+                                      (prevState: IPayloadCreateFood) => ({
+                                        ...prevState,
+                                        nameFood: e.target.value,
+                                      })
+                                    )
+                                  }
                                 />
                               </Form.Group>
 
                               <Form.Group className="mb-3">
                                 <Form.Label>Loại món ăn</Form.Label>
-                                <Form.Select>
+                                <Form.Select
+                                  onChange={(e) =>
+                                    setPayload(
+                                      (prevState: IPayloadCreateFood) => ({
+                                        ...prevState,
+                                        typeFood: e.target.value,
+                                      })
+                                    )
+                                  }
+                                >
                                   {typeFoods.map((item) => (
                                     <option key={item.id} value={item.value}>
                                       {item.name}
@@ -110,6 +178,14 @@ export default function AddFood() {
                                   type="number"
                                   placeholder="Nhập thành tiền"
                                   name="price"
+                                  onChange={(e) =>
+                                    setPayload(
+                                      (prevState: IPayloadCreateFood) => ({
+                                        ...prevState,
+                                        price: e.target.value,
+                                      })
+                                    )
+                                  }
                                 />
                               </Form.Group>
                               <Form.Group className="mb-3">
@@ -118,6 +194,14 @@ export default function AddFood() {
                                   type="number"
                                   placeholder="Nhập số lượng"
                                   name="amount"
+                                  onChange={(e) =>
+                                    setPayload(
+                                      (prevState: IPayloadCreateFood) => ({
+                                        ...prevState,
+                                        amount: e.target.value,
+                                      })
+                                    )
+                                  }
                                 />
                               </Form.Group>
                               <Form.Group className="mb-3">
@@ -127,6 +211,14 @@ export default function AddFood() {
                                     as="textarea"
                                     placeholder="Nhập mô tả"
                                     style={{ height: "100px" }}
+                                    onChange={(e) =>
+                                      setPayload(
+                                        (prevState: IPayloadCreateFood) => ({
+                                          ...prevState,
+                                          description: e.target.value,
+                                        })
+                                      )
+                                    }
                                   />
                                 </FloatingLabel>
                               </Form.Group>
@@ -139,7 +231,15 @@ export default function AddFood() {
                                     className="mb-3"
                                   >
                                     <Form.Label>Hình ảnh</Form.Label>
-                                    <Form.Control type="file" />
+                                    <Form.Control
+                                      accept="image/*"
+                                      type="file"
+                                      onChange={(e) =>
+                                        handleChangeUploadFile(
+                                          e as React.ChangeEvent<HTMLInputElement>
+                                        )
+                                      }
+                                    />
                                   </Form.Group>
                                 </Col>
                                 <Col sm={3}>
@@ -187,7 +287,11 @@ export default function AddFood() {
                               >
                                 Xác nhận
                               </Button>
-                              <SpinnerRoundOutlined />
+                              {isLoadingCreate ? (
+                                <SpinnerRoundOutlined />
+                              ) : (
+                                <div></div>
+                              )}
                               <Link to="/admin">
                                 <Button variant="secondary">Huỷ</Button>
                               </Link>
