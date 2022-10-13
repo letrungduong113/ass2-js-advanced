@@ -4,6 +4,10 @@ import Row from "react-bootstrap/Row";
 import Tab from "react-bootstrap/Tab";
 import Categories from "./categories/index";
 import AdminFoods from "./foods";
+import Button from "react-bootstrap/Button";
+import Stack from "react-bootstrap/Stack";
+import { Link } from "react-router-dom";
+import "./style.css";
 export default function Admin() {
   return (
     <div className="container">
@@ -23,7 +27,21 @@ export default function Admin() {
             <Col sm={9}>
               <Tab.Content>
                 <Tab.Pane eventKey="first">
-                  <AdminFoods />
+                  <Row>
+                    <Col sm={12}>
+                      <Stack direction="horizontal" gap={2}>
+                        <div className="">Món ăn</div>
+                        <div className="border ms-auto">
+                          <Link className="link-text" to="/admin/add-food">
+                            <Button variant="primary">Thêm mới</Button>
+                          </Link>
+                        </div>
+                      </Stack>
+                    </Col>
+                    <Col sm={12}>
+                      <AdminFoods />
+                    </Col>
+                  </Row>
                 </Tab.Pane>
                 <Tab.Pane eventKey="second">
                   <Categories />

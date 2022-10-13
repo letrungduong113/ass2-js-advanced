@@ -1,3 +1,25 @@
 {
-  "foods": []
+  "foods": [],
+  "typeFoods": [
+    {
+      "id": 1,
+      "name": "Vui lòng chọn loại món",
+      "value": ""
+    },
+    {
+      "id": 2,
+      "name": "Món khai vị",
+      "value": 2
+    },
+    {
+      "id": 3,
+      "name": "Món mặn",
+      "value": 3
+    },
+    {
+      "id": 4,
+      "name": "Món ngọt",
+      "value": 4
+    }
+  ]
 }
