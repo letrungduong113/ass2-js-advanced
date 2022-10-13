@@ -1,25 +1,21 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Fragment } from "react";
+import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/layout";
+import AdminFoods from "./views/admin/foods";
+import ClientFoods from "./views/client/foods";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="admin/foods" element={<AdminFoods />} />
+          <Route path="/" element={<ClientFoods />} />
+          {/* <Route path="*" element={<NoMatch />} /> */}
+        </Route>
+      </Routes>
+    </Fragment>
   );
 }
 
