@@ -14,11 +14,14 @@ import { API_UPLOAD_IMG, API_URL_DEV } from "../../../env/environment.dev";
 import { SpinnerRoundOutlined } from "spinners-react";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import { IPayloadCreateFood, IResUploadFile } from "../../../model/admin.model";
+import ToastComponent from "../../../components/toast";
 
 export default function AddFood() {
   const [typeFoods, setTypeFoods] = useState<ITypeFoods[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [descriptionToast, setDescriptionToast] = useState<string>("");
   const [isLoadingCreate, setIsLoadingCreate] = useState<boolean>(false);
+  const [isToggleToast, setIsToggleToast] = useState(false);
   const [payload, setPayload] = useState<IPayloadCreateFood>({
     typeProduct: "",
     nameFood: "",
@@ -31,6 +34,7 @@ export default function AddFood() {
   const [fileUpload, setFileUpload] = useState<any | null>(null);
   const { typeProduct } = payload;
   const navigate = useNavigate();
+  const handleToggleToast = () => setIsToggleToast(!isToggleToast);
   useEffect(() => {
     const controller = new AbortController();
     setIsLoading(true);
@@ -48,8 +52,24 @@ export default function AddFood() {
       });
     return () => controller.abort();
   }, []);
+  useEffect(() => {
+    if (payload.imgUrl) postCreateFood();
+  }, [payload]);
   const onSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
+    if (
+      !payload.amount ||
+      !payload.description ||
+      !fileUpload ||
+      !payload.nameFood ||
+      !payload.price ||
+      !payload.typeFood ||
+      !payload.typeProduct
+    ) {
+      setDescriptionToast("Vui lòng điền đẩy đủ thông tin");
+      handleToggleToast();
+      return;
+    }
     const formData = new FormData();
     formData.append("img", fileUpload);
     setIsLoadingCreate(true);
@@ -64,7 +84,6 @@ export default function AddFood() {
           imgUrl: res.imgLink,
         }));
         setIsLoadingCreate(false);
-        postCreateFood();
       })
       .catch((error) => {
         console.error(error);
@@ -82,9 +101,12 @@ export default function AddFood() {
     })
       .then((response) => response.json())
       .then((res) => {
-        console.log(res);
         setIsLoadingCreate(false);
-        navigate("/admin");
+        setDescriptionToast("Thêm mới thành công");
+        handleToggleToast();
+        setTimeout(() => {
+          navigate("/admin");
+        }, 3000);
       })
       .catch((error) => {
         console.error(error);
@@ -108,6 +130,13 @@ export default function AddFood() {
   return (
     <div className="container">
       <div className="row">
+        <div className="wrp-toast">
+          <ToastComponent
+            description={descriptionToast}
+            isToggle={isToggleToast}
+            handleToggle={handleToggleToast}
+          />
+        </div>
         <Tab.Container id="left-tabs-example" defaultActiveKey="first">
           <Row>
             <Col sm={3}>
@@ -287,14 +316,17 @@ export default function AddFood() {
                               >
                                 Xác nhận
                               </Button>
+
+                              <Link to="/admin">
+                                <Button variant="secondary">Huỷ</Button>
+                              </Link>
+                            </Col>
+                            <Col sm={12}>
                               {isLoadingCreate ? (
                                 <SpinnerRoundOutlined />
                               ) : (
                                 <div></div>
                               )}
-                              <Link to="/admin">
-                                <Button variant="secondary">Huỷ</Button>
-                              </Link>
                             </Col>
                           </Row>
                         </Form>
