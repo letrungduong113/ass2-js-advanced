@@ -45,10 +45,10 @@ export default function AddFood() {
     e.preventDefault();
   };
 
-  const handleChangeRadio = (e: any) => {
+  const handleChangeRadio = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.persist();
 
-    setPayload((prevState: any) => ({
+    setPayload((prevState: IPayloadCreateFood) => ({
       ...prevState,
       typeProduct: e.target.value,
     }));
@@ -138,9 +138,7 @@ export default function AddFood() {
                                     controlId="formFile"
                                     className="mb-3"
                                   >
-                                    <Form.Label>
-                                      Hình ảnh
-                                    </Form.Label>
+                                    <Form.Label>Hình ảnh</Form.Label>
                                     <Form.Control type="file" />
                                   </Form.Group>
                                 </Col>
@@ -154,7 +152,7 @@ export default function AddFood() {
                                     label="Mới"
                                     type="radio"
                                     checked={typeProduct === "1"}
-                                    onChange={handleChangeRadio}
+                                    onChange={(e) => handleChangeRadio(e)}
                                   />
                                 </Col>
 
@@ -165,7 +163,7 @@ export default function AddFood() {
                                     label="Truyền thống"
                                     type="radio"
                                     checked={typeProduct === "2"}
-                                    onChange={handleChangeRadio}
+                                    onChange={(e) => handleChangeRadio(e)}
                                   />
                                 </Col>
                                 <Col sm={3}>
@@ -175,7 +173,7 @@ export default function AddFood() {
                                     label="Phải thử"
                                     type="radio"
                                     checked={typeProduct === "3"}
-                                    onChange={handleChangeRadio}
+                                    onChange={(e) => handleChangeRadio(e)}
                                   />
                                 </Col>
                               </Row>
@@ -189,6 +187,7 @@ export default function AddFood() {
                               >
                                 Xác nhận
                               </Button>
+                              <SpinnerRoundOutlined />
                               <Link to="/admin">
                                 <Button variant="secondary">Huỷ</Button>
                               </Link>
