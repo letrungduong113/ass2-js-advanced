@@ -8,6 +8,7 @@ export interface IPayloadCreateFood {
   imgUrl: string;
 }
 
+export interface IMessErrors extends IPayloadCreateFood {}
 export interface IResUploadFile {
   imgLink: string;
   status: boolean;

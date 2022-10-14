@@ -13,8 +13,13 @@ import { ITypeFoods } from "../../../model/common.model";
 import { API_UPLOAD_IMG, API_URL_DEV } from "../../../env/environment.dev";
 import { SpinnerRoundOutlined } from "spinners-react";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
-import { IPayloadCreateFood, IResUploadFile } from "../../../model/admin.model";
+import {
+  IMessErrors,
+  IPayloadCreateFood,
+  IResUploadFile,
+} from "../../../model/admin.model";
 import ToastComponent from "../../../components/toast";
+import { ImagePreview } from "../../../components/imgPreview";
 
 export default function AddFood() {
   const [typeFoods, setTypeFoods] = useState<ITypeFoods[]>([]);
@@ -31,45 +36,41 @@ export default function AddFood() {
     description: "",
     imgUrl: "",
   });
+  const [messErrs, setMessErrs] = useState<IMessErrors>({
+    typeProduct: "",
+    nameFood: "",
+    typeFood: "",
+    price: "",
+    amount: "",
+    description: "",
+    imgUrl: "",
+  });
   const [fileUpload, setFileUpload] = useState<any | null>(null);
+  const [imgData, setImgData] = useState<any | null>(null);
   const { typeProduct } = payload;
   const navigate = useNavigate();
   const handleToggleToast = () => setIsToggleToast(!isToggleToast);
   useEffect(() => {
-    const controller = new AbortController();
     setIsLoading(true);
-    fetch(`${API_URL_DEV}/typeFoods`, {
-      signal: controller.signal,
-    })
+    fetch(`${API_URL_DEV}/typeFoods`)
       .then((response) => response.json())
       .then((data: ITypeFoods[]) => {
         setIsLoading(false);
         setTypeFoods(data);
       })
       .catch((error) => {
-        console.log(error);
+        setDescriptionToast("Đã xảy ra lỗi");
+        handleToggleToast();
         setIsLoading(false);
       });
-    return () => controller.abort();
   }, []);
   useEffect(() => {
     if (payload.imgUrl) postCreateFood();
   }, [payload]);
   const onSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    if (
-      !payload.amount ||
-      !payload.description ||
-      !fileUpload ||
-      !payload.nameFood ||
-      !payload.price ||
-      !payload.typeFood ||
-      !payload.typeProduct
-    ) {
-      setDescriptionToast("Vui lòng điền đẩy đủ thông tin");
-      handleToggleToast();
-      return;
-    }
+    if (!isValidationForm()) return;
+
     const formData = new FormData();
     formData.append("img", fileUpload);
     setIsLoadingCreate(true);
@@ -90,6 +91,90 @@ export default function AddFood() {
         setIsLoadingCreate(false);
       });
   };
+
+  function isValidationForm(): boolean {
+    let isFlag = true;
+    const { nameFood, typeFood, price, amount, typeProduct } = payload;
+    if (nameFood.length < 1) {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        nameFood: "Vui lòng nhập tên món ăn",
+      }));
+      isFlag = false;
+    } else {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        nameFood: "",
+      }));
+      isFlag = true;
+    }
+    if (typeof typeFood === "string") {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        typeFood: "Vui lòng chọn loại món ăn",
+      }));
+      isFlag = false;
+    } else {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        typeFood: "",
+      }));
+      isFlag = true;
+    }
+    if (typeof price === "string") {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        price: "Vui lòng nhập thành tiền",
+      }));
+      isFlag = false;
+    } else {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        price: "",
+      }));
+      isFlag = true;
+    }
+    if (typeof amount === "string") {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        amount: "Vui lòng nhập số lượng",
+      }));
+      isFlag = false;
+    } else {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        amount: "",
+      }));
+      isFlag = true;
+    }
+    if (!typeProduct) {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        typeProduct: "Vui lòng chọn loại sản phẩm",
+      }));
+      isFlag = false;
+    } else {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        typeProduct: "",
+      }));
+      isFlag = true;
+    }
+    if (!fileUpload) {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        imgUrl: "Vui lòng upload ảnh",
+      }));
+      isFlag = false;
+    } else {
+      setMessErrs((prevState: IMessErrors) => ({
+        ...prevState,
+        imgUrl: "",
+      }));
+      isFlag = true;
+    }
+    return isFlag;
+  }
 
   function postCreateFood() {
     setIsLoadingCreate(true);
@@ -124,8 +209,19 @@ export default function AddFood() {
   };
 
   function handleChangeUploadFile(event: any) {
-    setFileUpload(event.target?.files?.item(0));
+    const file = event.target?.files?.item(0);
+    setFileUpload(file);
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      setImgData(reader.result);
+    });
+    reader.readAsDataURL(file);
   }
+
+  const handleRemoveImgPreview = () => {
+    setFileUpload(null);
+    setImgData(null);
+  };
 
   return (
     <div className="container">
@@ -180,6 +276,9 @@ export default function AddFood() {
                                     )
                                   }
                                 />
+                                <div className="mess-err">
+                                  {messErrs.nameFood}
+                                </div>
                               </Form.Group>
 
                               <Form.Group className="mb-3">
@@ -189,7 +288,7 @@ export default function AddFood() {
                                     setPayload(
                                       (prevState: IPayloadCreateFood) => ({
                                         ...prevState,
-                                        typeFood: e.target.value,
+                                        typeFood: Number(e.target.value),
                                       })
                                     )
                                   }
@@ -200,6 +299,9 @@ export default function AddFood() {
                                     </option>
                                   ))}
                                 </Form.Select>
+                                <div className="mess-err">
+                                  {messErrs.typeFood}
+                                </div>
                               </Form.Group>
                               <Form.Group className="mb-3">
                                 <Form.Label>Thành tiền</Form.Label>
@@ -211,11 +313,12 @@ export default function AddFood() {
                                     setPayload(
                                       (prevState: IPayloadCreateFood) => ({
                                         ...prevState,
-                                        price: e.target.value,
+                                        price: parseFloat(e.target.value),
                                       })
                                     )
                                   }
                                 />
+                                <div className="mess-err">{messErrs.price}</div>
                               </Form.Group>
                               <Form.Group className="mb-3">
                                 <Form.Label>Số lượng</Form.Label>
@@ -227,11 +330,14 @@ export default function AddFood() {
                                     setPayload(
                                       (prevState: IPayloadCreateFood) => ({
                                         ...prevState,
-                                        amount: e.target.value,
+                                        amount: Number(e.target.value),
                                       })
                                     )
                                   }
                                 />
+                                <div className="mess-err">
+                                  {messErrs.amount}
+                                </div>
                               </Form.Group>
                               <Form.Group className="mb-3">
                                 <Form.Label>Mô tả</Form.Label>
@@ -255,21 +361,31 @@ export default function AddFood() {
                             <Col sm={6}>
                               <Row>
                                 <Col sm={12}>
-                                  <Form.Group
-                                    controlId="formFile"
-                                    className="mb-3"
-                                  >
-                                    <Form.Label>Hình ảnh</Form.Label>
-                                    <Form.Control
-                                      accept="image/*"
-                                      type="file"
-                                      onChange={(e) =>
-                                        handleChangeUploadFile(
-                                          e as React.ChangeEvent<HTMLInputElement>
-                                        )
-                                      }
+                                  {fileUpload ? (
+                                    <ImagePreview
+                                      handleRemove={handleRemoveImgPreview}
+                                      imgData={imgData}
                                     />
-                                  </Form.Group>
+                                  ) : (
+                                    <Form.Group
+                                      controlId="formFile"
+                                      className="mb-3"
+                                    >
+                                      <Form.Label>Hình ảnh</Form.Label>
+                                      <Form.Control
+                                        accept="image/*"
+                                        type="file"
+                                        onChange={(e) =>
+                                          handleChangeUploadFile(
+                                            e as React.ChangeEvent<HTMLInputElement>
+                                          )
+                                        }
+                                      />
+                                      <div className="mess-err">
+                                        {messErrs.imgUrl}
+                                      </div>
+                                    </Form.Group>
+                                  )}
                                 </Col>
                                 <Col sm={3}>
                                   <Form.Label>Sản phẩm</Form.Label>
@@ -304,6 +420,11 @@ export default function AddFood() {
                                     checked={typeProduct === "3"}
                                     onChange={(e) => handleChangeRadio(e)}
                                   />
+                                </Col>
+                                <Col sm={12}>
+                                  <div className="mess-err">
+                                    {messErrs.typeProduct}
+                                  </div>
                                 </Col>
                               </Row>
                             </Col>

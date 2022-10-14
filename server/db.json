@@ -29,6 +29,26 @@
       "description": "dasdasd",
       "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665686363/imgUploadJsAdvanced/myhzvzzajqspcag5bnhx.png",
       "id": 3
+    },
+    {
+      "typeProduct": "",
+      "nameFood": "",
+      "typeFood": "",
+      "price": "",
+      "amount": "",
+      "description": "",
+      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665765926/imgUploadJsAdvanced/ouj4ps8ql7qbzteijd2j.png",
+      "id": 4
+    },
+    {
+      "typeProduct": "3",
+      "nameFood": "mon an 1",
+      "typeFood": 3,
+      "price": 1400,
+      "amount": 12,
+      "description": "tao moi",
+      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665766040/imgUploadJsAdvanced/a5tydtbwqehrikyfbjky.jpg",
+      "id": 5
     }
   ],
   "typeFoods": [

@@ -23,3 +23,9 @@ body {
   justify-content: center;
   align-items: center;
 }
+.mess-err {
+  color: red;
+  display: block;
+  padding: 5px 0 10px 0;
+  font-size: 16px;
+}
