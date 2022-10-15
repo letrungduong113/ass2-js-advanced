@@ -36,3 +36,14 @@ body {
 .txt-center {
   text-align: center;
 }
+.txt-right {
+  text-align: right;
+}
+
+.color-white {
+  color: #fff;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

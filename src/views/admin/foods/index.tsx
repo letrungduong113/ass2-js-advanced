@@ -47,7 +47,7 @@ export default function AdminFoods() {
   useEffect(() => {
     setPaginateTable((prevState: IPaginateTableFoods) => ({
       ...prevState,
-      totalPages: Math.round(paginateTable.totalItems / paginateTable.limit),
+      totalPages: Math.ceil(paginateTable.totalItems / paginateTable.limit),
     }));
   }, [paginateTable.totalItems]);
   function onChangePage(num: number) {

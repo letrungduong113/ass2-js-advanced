@@ -87,16 +87,6 @@ const UpdateFood = () => {
           description: res.description,
           imgUrl: res.imgUrl,
         }));
-        setMessErrs((prevState: IMessErrors) => ({
-          ...prevState,
-          typeProduct: "",
-          nameFood: "",
-          typeFood: "",
-          price: "",
-          amount: "",
-          description: "",
-          imgUrl: "",
-        }));
         setImgData(res.imgUrl);
         setFileUpload(res.imgUrl);
       })

@@ -29,6 +29,26 @@
       "description": "dasdasd",
       "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665804675/imgUploadJsAdvanced/sdn5iir8pluvznculbvf.jpg",
       "id": 3
+    },
+    {
+      "typeProduct": "2",
+      "nameFood": "thit ga 44243",
+      "typeFood": "",
+      "price": "",
+      "amount": "",
+      "description": "",
+      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665825206/imgUploadJsAdvanced/nowmgkgnc9o0dlraghrq.jpg",
+      "id": 4
+    },
+    {
+      "typeProduct": "",
+      "nameFood": "duong",
+      "typeFood": "",
+      "price": "",
+      "amount": "",
+      "description": "",
+      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665825517/imgUploadJsAdvanced/vzih1mfrlmpqmrsax2rv.jpg",
+      "id": 5
     }
   ],
   "typeFoods": [
