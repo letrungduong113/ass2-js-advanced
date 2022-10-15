@@ -8,12 +8,14 @@ import { IListFoods, ITypeFoods } from "../../../model/common.model";
 import "../style.css";
 import Pagination from "react-bootstrap/Pagination";
 import { formatCurrencyVND } from "../../../shared/utils";
+import Button from "react-bootstrap/Button";
+import { Link } from "react-router-dom";
 
 export default function AdminFoods() {
   const [typeFoods, setTypeFoods] = useState<ITypeFoods[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [descriptionToast, setDescriptionToast] = useState<string>("");
-  const [isToggleToast, setIsToggleToast] = useState(false);
+  const [isToggleToast, setIsToggleToast] = useState<boolean>(false);
   const [listFoods, setListFoods] = useState<IListFoods[]>([]);
   const [paginateTable, setPaginateTable] = useState<IPaginateTableFoods>({
     page: 1,
@@ -103,13 +105,13 @@ export default function AdminFoods() {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>STT</th>
-            <th>Tên món ăn</th>
-            <th>Thành tiền</th>
-            <th>Ảnh</th>
-            <th>Danh mục</th>
-            <th>Loại sản phẩm</th>
-            <th>Chức năng</th>
+            <th className="txt-center">STT</th>
+            <th className="txt-center">Tên món ăn</th>
+            <th className="txt-center">Thành tiền</th>
+            <th className="txt-center">Ảnh</th>
+            <th className="txt-center">Danh mục</th>
+            <th className="txt-center">Loại sản phẩm</th>
+            <th className="txt-center">Chức năng</th>
           </tr>
         </thead>
         <tbody>
@@ -120,21 +122,30 @@ export default function AdminFoods() {
               {listFoods.map((item, index) => {
                 return (
                   <tr key={item.id}>
-                    <td>{index + 1}</td>
-                    <td>{item.amount}</td>
-                    <td>{formatCurrencyVND(item.price)}</td>
-                    <td>
+                    <td className="txt-center">{index + 1}</td>
+                    <td className="txt-center">{item.amount}</td>
+                    <td className="txt-center">
+                      {formatCurrencyVND(item.price)}
+                    </td>
+                    <td className="txt-center">
                       <img className="item-img-tb" src={item.imgUrl} />
                     </td>
-                    <td>
+                    <td className="txt-center">
                       {typeFoods.map((type) => {
                         return Number(item.typeFood) === type.value
                           ? type.name
                           : "";
                       })}
                     </td>
-                    <td>{item.typeProduct}</td>
-                    <td></td>
+                    <td className="txt-center">{item.typeProduct}</td>
+                    <td className="txt-center">
+                      <Link to={`update-food/${item.id}`}>
+                        <Button variant="warning">Sửa</Button>
+                      </Link>
+                      <Button className="mt-12" variant="danger">
+                        Xoá
+                      </Button>
+                    </td>
                   </tr>
                 );
               })}

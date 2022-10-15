@@ -4,7 +4,7 @@ import Row from "react-bootstrap/Row";
 import Tab from "react-bootstrap/Tab";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "../style.css";
 import Categories from "../categories";
 import Form from "react-bootstrap/Form";
@@ -15,19 +15,20 @@ import { SpinnerRoundOutlined } from "spinners-react";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import {
   IMessErrors,
-  IPayloadCreateFood,
+  IPayloadDetailFood,
+  IPayloadUpdateFood,
   IResUploadFile,
 } from "../../../model/admin.model";
 import ToastComponent from "../../../components/toast";
 import { ImagePreview } from "../../../components/imgPreview";
-
-export default function AddFood() {
+const UpdateFood = () => {
+  const { id } = useParams<"id">();
   const [typeFoods, setTypeFoods] = useState<ITypeFoods[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [descriptionToast, setDescriptionToast] = useState<string>("");
-  const [isLoadingCreate, setIsLoadingCreate] = useState<boolean>(false);
+  const [isLoadingCreate, setIsLoadingUpdate] = useState<boolean>(false);
   const [isToggleToast, setIsToggleToast] = useState<boolean>(false);
-  const [payload, setPayload] = useState<IPayloadCreateFood>({
+  const [payload, setPayload] = useState<IPayloadUpdateFood>({
     typeProduct: "",
     nameFood: "",
     typeFood: "",
@@ -47,6 +48,7 @@ export default function AddFood() {
   });
   const [fileUpload, setFileUpload] = useState<any | null>(null);
   const [imgData, setImgData] = useState<any | null>(null);
+  const [isSubmit, setIsSubmit] = useState<boolean>(false);
   const { typeProduct } = payload;
   const navigate = useNavigate();
   const handleToggleToast = () => setIsToggleToast(!isToggleToast);
@@ -65,30 +67,68 @@ export default function AddFood() {
       });
   }, []);
   useEffect(() => {
-    if (payload.imgUrl) postCreateFood();
-  }, [payload]);
+    setIsLoadingUpdate(true);
+    fetch(`${API_URL_DEV}/foods/${id}`, {
+      credentials: "same-origin",
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then((res: IPayloadDetailFood) => {
+        setIsLoadingUpdate(false);
+        setPayload((prevState: IPayloadUpdateFood) => ({
+          ...prevState,
+          typeProduct: res.typeProduct,
+          nameFood: res.nameFood,
+          typeFood: res.typeFood,
+          price: res.price,
+          amount: res.amount,
+          description: res.description,
+          imgUrl: res.imgUrl,
+        }));
+        setMessErrs((prevState: IMessErrors) => ({
+          ...prevState,
+          typeProduct: "",
+          nameFood: "",
+          typeFood: "",
+          price: "",
+          amount: "",
+          description: "",
+          imgUrl: "",
+        }));
+        setImgData(res.imgUrl);
+        setFileUpload(res.imgUrl);
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsLoadingUpdate(false);
+      });
+  }, [id]);
+  useEffect(() => {
+    if (payload.imgUrl && isSubmit) putUpdateFood();
+  }, [payload, isSubmit]);
   const onSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     if (!isValidationForm()) return;
-
+    setIsSubmit(true);
     const formData = new FormData();
     formData.append("img", fileUpload);
-    setIsLoadingCreate(true);
+    setIsLoadingUpdate(true);
     fetch(API_UPLOAD_IMG, {
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((res: IResUploadFile) => {
-        setPayload((prevState: IPayloadCreateFood) => ({
+        setPayload((prevState: IPayloadUpdateFood) => ({
           ...prevState,
           imgUrl: res.imgLink,
         }));
-        setIsLoadingCreate(false);
+        setIsLoadingUpdate(false);
       })
       .catch((error) => {
         console.error(error);
-        setIsLoadingCreate(false);
+        setIsLoadingUpdate(false);
       });
   };
 
@@ -176,18 +216,18 @@ export default function AddFood() {
     return isFlag;
   }
 
-  function postCreateFood() {
-    setIsLoadingCreate(true);
-    fetch(`${API_URL_DEV}/foods`, {
+  function putUpdateFood() {
+    setIsLoadingUpdate(true);
+    fetch(`${API_URL_DEV}/foods/${id}`, {
       credentials: "same-origin", // 'include', default: 'omit'
-      method: "POST", // 'GET', 'PUT', 'DELETE', etc.
+      method: "PUT", // 'GET', 'PUT', 'DELETE', etc.
       body: JSON.stringify(payload), // Use correct payload (matching 'Content-Type')
       headers: { "Content-Type": "application/json" },
     })
       .then((response) => response.json())
       .then((res) => {
-        setIsLoadingCreate(false);
-        setDescriptionToast("Thêm mới thành công");
+        setIsLoadingUpdate(false);
+        setDescriptionToast("Cập nhật thành công");
         handleToggleToast();
         setTimeout(() => {
           navigate("/admin");
@@ -195,14 +235,14 @@ export default function AddFood() {
       })
       .catch((error) => {
         console.error(error);
-        setIsLoadingCreate(false);
+        setIsLoadingUpdate(false);
       });
   }
 
   const handleChangeRadio = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.persist();
 
-    setPayload((prevState: IPayloadCreateFood) => ({
+    setPayload((prevState: IPayloadUpdateFood) => ({
       ...prevState,
       typeProduct: e.target.value,
     }));
@@ -251,7 +291,7 @@ export default function AddFood() {
                   <Row>
                     <Col sm={12}>
                       <Stack direction="horizontal" gap={2}>
-                        <div className="">Thêm mới món ăn</div>
+                        <div className="">Cập nhật món ăn</div>
                       </Stack>
                     </Col>
                     {isLoading ? (
@@ -264,12 +304,13 @@ export default function AddFood() {
                               <Form.Group className="mb-3">
                                 <Form.Label>Tên món ăn</Form.Label>
                                 <Form.Control
+                                  value={payload.nameFood}
                                   type="text"
                                   placeholder="Nhập tên món ăn"
                                   name="nameFood"
                                   onChange={(e) =>
                                     setPayload(
-                                      (prevState: IPayloadCreateFood) => ({
+                                      (prevState: IPayloadUpdateFood) => ({
                                         ...prevState,
                                         nameFood: e.target.value,
                                       })
@@ -284,9 +325,10 @@ export default function AddFood() {
                               <Form.Group className="mb-3">
                                 <Form.Label>Loại món ăn</Form.Label>
                                 <Form.Select
+                                  value={payload.typeFood}
                                   onChange={(e) =>
                                     setPayload(
-                                      (prevState: IPayloadCreateFood) => ({
+                                      (prevState: IPayloadUpdateFood) => ({
                                         ...prevState,
                                         typeFood: Number(e.target.value),
                                       })
@@ -306,12 +348,13 @@ export default function AddFood() {
                               <Form.Group className="mb-3">
                                 <Form.Label>Thành tiền</Form.Label>
                                 <Form.Control
+                                  value={payload.price}
                                   type="number"
                                   placeholder="Nhập thành tiền"
                                   name="price"
                                   onChange={(e) =>
                                     setPayload(
-                                      (prevState: IPayloadCreateFood) => ({
+                                      (prevState: IPayloadUpdateFood) => ({
                                         ...prevState,
                                         price: parseFloat(e.target.value),
                                       })
@@ -323,12 +366,13 @@ export default function AddFood() {
                               <Form.Group className="mb-3">
                                 <Form.Label>Số lượng</Form.Label>
                                 <Form.Control
+                                  value={payload.amount}
                                   type="number"
                                   placeholder="Nhập số lượng"
                                   name="amount"
                                   onChange={(e) =>
                                     setPayload(
-                                      (prevState: IPayloadCreateFood) => ({
+                                      (prevState: IPayloadUpdateFood) => ({
                                         ...prevState,
                                         amount: Number(e.target.value),
                                       })
@@ -343,12 +387,13 @@ export default function AddFood() {
                                 <Form.Label>Mô tả</Form.Label>
                                 <FloatingLabel label="">
                                   <Form.Control
+                                    value={payload.description}
                                     as="textarea"
                                     placeholder="Nhập mô tả"
                                     style={{ height: "100px" }}
                                     onChange={(e) =>
                                       setPayload(
-                                        (prevState: IPayloadCreateFood) => ({
+                                        (prevState: IPayloadUpdateFood) => ({
                                           ...prevState,
                                           description: e.target.value,
                                         })
@@ -465,4 +510,6 @@ export default function AddFood() {
       </div>
     </div>
   );
-}
+};
+
+export default UpdateFood;

@@ -2,12 +2,12 @@
   "foods": [
     {
       "typeProduct": "3",
-      "nameFood": "thit ga 1000",
+      "nameFood": "duong",
       "typeFood": "2",
       "price": "10000",
       "amount": "100",
       "description": "hn",
-      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665685852/imgUploadJsAdvanced/aqofbfi0rz2iwxbomzn7.png",
+      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665804858/imgUploadJsAdvanced/l7fgsbhs93ybvlwgyqku.jpg",
       "id": 1
     },
     {
@@ -21,13 +21,13 @@
       "id": 2
     },
     {
-      "typeProduct": "1",
-      "nameFood": "thit ga 1000",
+      "typeProduct": "2",
+      "nameFood": "thit ga 1000 up",
       "typeFood": "2",
       "price": "12000",
       "amount": "5",
       "description": "dasdasd",
-      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665686363/imgUploadJsAdvanced/myhzvzzajqspcag5bnhx.png",
+      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665804675/imgUploadJsAdvanced/sdn5iir8pluvznculbvf.jpg",
       "id": 3
     },
     {

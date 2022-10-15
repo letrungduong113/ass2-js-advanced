@@ -5,6 +5,7 @@ import Layout from "./components/layout";
 import Admin from "./views/admin";
 import ClientFoods from "./views/client/foods";
 import AddFood from "./views/admin/foods/add-food";
+import UpdateFood from "./views/admin/foods/update-food";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/add-food" element={<AddFood />} />
+          <Route path="/admin/update-food/:id" element={<UpdateFood />} />
           <Route path="/" element={<ClientFoods />} />
           {/* <Route path="*" element={<NoMatch />} /> */}
         </Route>

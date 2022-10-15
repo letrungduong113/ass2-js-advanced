@@ -1,3 +1,5 @@
+import { IListFoods } from "./common.model";
+
 export interface IPayloadCreateFood {
   typeProduct: string;
   nameFood: string;
@@ -7,6 +9,10 @@ export interface IPayloadCreateFood {
   description: string;
   imgUrl: string;
 }
+
+export interface IPayloadDetailFood extends IListFoods {}
+
+export interface IPayloadUpdateFood extends IPayloadCreateFood {}
 
 export interface IMessErrors extends IPayloadCreateFood {}
 export interface IResUploadFile {
