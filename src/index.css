@@ -40,6 +40,10 @@ body {
   text-align: right;
 }
 
+.mb-18 {
+  margin-bottom: 18px;
+}
+
 .color-white {
   color: #fff;
 }

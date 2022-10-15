@@ -3,7 +3,7 @@ export const ImagePreview = ({
   imgData,
   handleRemove,
 }: {
-  imgData: any;
+  imgData: string | undefined;
   handleRemove: () => void;
 }) => {
   return (
