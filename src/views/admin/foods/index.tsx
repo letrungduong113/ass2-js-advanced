@@ -11,6 +11,7 @@ import { formatCurrencyVND } from "../../../shared/utils";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import ModalComponent from "../../../components/modal";
+import { FAKE_DATA_TYPE_PRODUCT } from "../../../shared/fake-data";
 
 export default function AdminFoods() {
   const [typeFoods, setTypeFoods] = useState<ITypeFoods[]>([]);
@@ -61,7 +62,6 @@ export default function AdminFoods() {
     setIsToggleModal(true);
   };
   const handleConfirmDelete = () => {
-    console.log("aaa", idFood);
     setIsLoading(true);
     fetch(`${API_URL_DEV}/foods/${idFood}`, {
       credentials: "same-origin", // 'include', default: 'omit'
@@ -124,7 +124,7 @@ export default function AdminFoods() {
   const handleToggleToast = () => setIsToggleToast(!isToggleToast);
 
   return (
-    <>
+    <div className="mt-12">
       <ToastComponent
         description={descriptionToast}
         isToggle={isToggleToast}
@@ -171,7 +171,11 @@ export default function AdminFoods() {
                           : "";
                       })}
                     </td>
-                    <td className="txt-center">{item.typeProduct}</td>
+                    <td className="txt-center">
+                      {FAKE_DATA_TYPE_PRODUCT.map((item2) =>
+                        item2.value === item.typeProduct ? item2.name : ""
+                      )}
+                    </td>
                     <td className="txt-center">
                       <Link to={`update-food/${item.id}`}>
                         <Button variant="warning">Sửa</Button>
@@ -194,6 +198,6 @@ export default function AdminFoods() {
           <Pagination>{viewPaginates}</Pagination>
         </div>
       </Table>
-    </>
+    </div>
   );
 }

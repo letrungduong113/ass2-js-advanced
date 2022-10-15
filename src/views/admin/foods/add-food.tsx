@@ -20,6 +20,7 @@ import {
 } from "../../../model/admin.model";
 import ToastComponent from "../../../components/toast";
 import { ImagePreview } from "../../../components/imgPreview";
+import { FAKE_DATA_TYPE_PRODUCT } from "../../../shared/fake-data";
 
 export default function AddFood() {
   const [typeFoods, setTypeFoods] = useState<ITypeFoods[]>([]);
@@ -390,37 +391,21 @@ export default function AddFood() {
                                 <Col sm={3}>
                                   <Form.Label>Sản phẩm</Form.Label>
                                 </Col>
-                                <Col sm={3}>
-                                  <Form.Check
-                                    inline
-                                    value="1"
-                                    label="Mới"
-                                    type="radio"
-                                    checked={typeProduct === "1"}
-                                    onChange={(e) => handleChangeRadio(e)}
-                                  />
-                                </Col>
+                                {FAKE_DATA_TYPE_PRODUCT.map((item, index) => {
+                                  return (
+                                    <Col sm={3} key={item.id}>
+                                      <Form.Check
+                                        inline
+                                        value={item.value}
+                                        label={item.name}
+                                        type="radio"
+                                        checked={typeProduct === item.value}
+                                        onChange={(e) => handleChangeRadio(e)}
+                                      />
+                                    </Col>
+                                  );
+                                })}
 
-                                <Col sm={3}>
-                                  <Form.Check
-                                    inline
-                                    value="2"
-                                    label="Truyền thống"
-                                    type="radio"
-                                    checked={typeProduct === "2"}
-                                    onChange={(e) => handleChangeRadio(e)}
-                                  />
-                                </Col>
-                                <Col sm={3}>
-                                  <Form.Check
-                                    inline
-                                    value="3"
-                                    label="Phải thử"
-                                    type="radio"
-                                    checked={typeProduct === "3"}
-                                    onChange={(e) => handleChangeRadio(e)}
-                                  />
-                                </Col>
                                 <Col sm={12}>
                                   <div className="mess-err">
                                     {messErrs.typeProduct}
