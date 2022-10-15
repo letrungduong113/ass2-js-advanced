@@ -13,3 +13,10 @@ export interface IResUploadFile {
   imgLink: string;
   status: boolean;
 }
+
+export interface IPaginateTableFoods {
+  page: number;
+  limit: number;
+  totalItems: number;
+  totalPages: number;
+}
