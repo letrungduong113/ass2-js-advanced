@@ -10,6 +10,7 @@ import Pagination from "react-bootstrap/Pagination";
 import { formatCurrencyVND } from "../../../shared/utils";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
+import ModalComponent from "../../../components/modal";
 
 export default function AdminFoods() {
   const [typeFoods, setTypeFoods] = useState<ITypeFoods[]>([]);
@@ -24,6 +25,8 @@ export default function AdminFoods() {
     totalPages: 0,
   });
   const [viewPaginates, setViewPaginates] = useState<any[]>([]);
+  const [isToggleModal, setIsToggleModal] = useState<boolean>(false);
+  const [idFood, setIdFood] = useState<number | null>(null);
   useEffect(() => {
     let items = [];
     if (paginateTable.totalPages)
@@ -52,6 +55,31 @@ export default function AdminFoods() {
       page: num,
     }));
   }
+  const handleCloseModal = () => setIsToggleModal(false);
+  const handleShowModal = (id: number) => {
+    setIdFood(id);
+    setIsToggleModal(true);
+  };
+  const handleConfirmDelete = () => {
+    console.log("aaa", idFood);
+    setIsLoading(true);
+    fetch(`${API_URL_DEV}/foods/${idFood}`, {
+      credentials: "same-origin", // 'include', default: 'omit'
+      method: "DELETE", // 'GET', 'PUT', 'DELETE', etc.
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setIsLoading(false);
+        setDescriptionToast("Xoá thành công");
+        handleToggleToast();
+        handleCloseModal();
+        fetchListFoods();
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsLoading(false);
+      });
+  };
   useEffect(() => {
     setIsLoading(true);
     fetch(`${API_URL_DEV}/typeFoods`)
@@ -102,6 +130,12 @@ export default function AdminFoods() {
         isToggle={isToggleToast}
         handleToggle={handleToggleToast}
       />
+      <ModalComponent
+        description="Bạn có muốn chắc chắn xoá sản phẩm này không?"
+        show={isToggleModal}
+        handleClose={handleCloseModal}
+        handleConfirm={handleConfirmDelete}
+      />
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -142,7 +176,11 @@ export default function AdminFoods() {
                       <Link to={`update-food/${item.id}`}>
                         <Button variant="warning">Sửa</Button>
                       </Link>
-                      <Button className="mt-12" variant="danger">
+                      <Button
+                        onClick={(e) => handleShowModal(item.id)}
+                        className="mt-12"
+                        variant="danger"
+                      >
                         Xoá
                       </Button>
                     </td>

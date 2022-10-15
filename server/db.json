@@ -4,7 +4,7 @@
       "typeProduct": "3",
       "nameFood": "duong",
       "typeFood": "2",
-      "price": "10000",
+      "price": 16000,
       "amount": "100",
       "description": "hn",
       "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665804858/imgUploadJsAdvanced/l7fgsbhs93ybvlwgyqku.jpg",
@@ -29,26 +29,6 @@
       "description": "dasdasd",
       "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665804675/imgUploadJsAdvanced/sdn5iir8pluvznculbvf.jpg",
       "id": 3
-    },
-    {
-      "typeProduct": "",
-      "nameFood": "",
-      "typeFood": "",
-      "price": "",
-      "amount": "",
-      "description": "",
-      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665765926/imgUploadJsAdvanced/ouj4ps8ql7qbzteijd2j.png",
-      "id": 4
-    },
-    {
-      "typeProduct": "3",
-      "nameFood": "mon an 1",
-      "typeFood": 3,
-      "price": 1400,
-      "amount": 12,
-      "description": "tao moi",
-      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665766040/imgUploadJsAdvanced/a5tydtbwqehrikyfbjky.jpg",
-      "id": 5
     }
   ],
   "typeFoods": [
