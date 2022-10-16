@@ -72,5 +72,21 @@
       "name": "Món ngọt",
       "value": 4
     }
+  ],
+  "carts": [
+    {
+      "id": 1,
+      "nameFood": "duong",
+      "price": 16000,
+      "amount": 2,
+      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665804858/imgUploadJsAdvanced/l7fgsbhs93ybvlwgyqku.jpg"
+    },
+    {
+      "id": 4,
+      "nameFood": "thit ga 44243",
+      "price": 10000,
+      "amount": 1,
+      "imgUrl": "https://res.cloudinary.com/dlvtzpxce/image/upload/v1665825206/imgUploadJsAdvanced/nowmgkgnc9o0dlraghrq.jpg"
+    }
   ]
 }

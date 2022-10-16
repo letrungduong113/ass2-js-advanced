@@ -38,5 +38,26 @@
 }
 
 .menu-active {
-    background: #C8102E;
+  background: #c8102e;
+}
+
+.wrp-content {
+  position: relative;
+}
+
+.cart {
+  position: absolute;
+  cursor: pointer;
+}
+
+.img-cart {
+  position: relative;
+}
+
+.total-cart {
+  position: absolute;
+  top: -15px;
+  left: 25px;
+  color: blue;
+  font-size: 18px;
 }
