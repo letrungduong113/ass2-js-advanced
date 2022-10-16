@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Pagination, Row } from "react-bootstrap";
-import { useSearchParams } from "react-router-dom";
+import { createSearchParams, useNavigate } from "react-router-dom";
 import { SpinnerRoundOutlined } from "spinners-react";
 import ToastComponent from "../../../components/toast";
 import { API_URL_DEV } from "../../../env/environment.dev";
@@ -8,7 +8,6 @@ import { IPaginateTableFoods } from "../../../model/admin.model";
 import { IQueryStringUrlSearch } from "../../../model/client.model";
 import { IListFoods, ITypeFoods } from "../../../model/common.model";
 import { FAKE_DATA_TYPE_PRODUCT } from "../../../shared/fake-data";
-import useQueryParam from "../../../shared/hooks/useQueryParam";
 import { formatCurrencyVND } from "../../../shared/utils";
 import "./style.css";
 export default function ClientFoods() {
@@ -25,12 +24,13 @@ export default function ClientFoods() {
   });
   const [viewPaginates, setViewPaginates] = useState<any[]>([]);
   const [itemMenuActive, setItemMenuActive] = useState<ITypeFoods | null>(null);
-  let [queryStringUrl, setQueryStringUrl] =
-    useQueryParam<IQueryStringUrlSearch>("url");
-  const [textSearch, setTextSearch] = useState<string>("");
-  if (!queryStringUrl) {
-    queryStringUrl = { q: "", typeFood: "" };
-  }
+
+  const [queryStringSearch, setQueryStringSearch] =
+    useState<IQueryStringUrlSearch>({
+      q: "",
+      typeFood: "",
+    });
+  const navigate = useNavigate();
   useEffect(() => {
     let items = [];
     if (paginateTable.totalPages)
@@ -49,6 +49,15 @@ export default function ClientFoods() {
     setViewPaginates(items);
   }, [paginateTable]);
   useEffect(() => {
+    navigate({
+      pathname: "/",
+      search: `?${createSearchParams({
+        q: queryStringSearch.q,
+        typeFood: queryStringSearch.typeFood,
+      })}`,
+    });
+  }, [queryStringSearch]);
+  useEffect(() => {
     const totalPages = Math.ceil(
       paginateTable.totalItems / paginateTable.limit
     );
@@ -65,15 +74,11 @@ export default function ClientFoods() {
   }
 
   function handleSearch() {
-    const url: IQueryStringUrlSearch = {
-      q: textSearch,
-      typeFood: String(itemMenuActive?.value),
-    };
-    setQueryStringUrl(url, { replace: true });
+    fetchListFoods();
   }
   useEffect(() => {
     fetchListFoods();
-  }, [paginateTable.page]);
+  }, [paginateTable.page, queryStringSearch.typeFood]);
   useEffect(() => {
     setIsLoading(true);
     fetch(`${API_URL_DEV}/typeFoods`)
@@ -88,17 +93,8 @@ export default function ClientFoods() {
         let newData = data.filter((item) => item.id !== 1);
         newData.unshift(itemAll);
         setTypeFoods(newData);
-        let queryTypeFood = newData.find(
-          (item) => item.value === Number(queryStringUrl?.typeFood)
-        );
 
-        const url: IQueryStringUrlSearch = {
-          q: textSearch,
-          typeFood: String(queryTypeFood?.value),
-        };
-        setQueryStringUrl(url, { replace: true });
-        const itemActive = queryTypeFood ? queryTypeFood : itemAll;
-        setItemMenuActive(itemActive);
+        setItemMenuActive(itemAll);
       })
       .catch((error) => {
         setDescriptionToast("Đã xảy ra lỗi");
@@ -109,10 +105,10 @@ export default function ClientFoods() {
   function fetchListFoods() {
     setIsLoading(true);
     let url = `${API_URL_DEV}/foods?_page=${paginateTable.page}&_limit=${paginateTable.limit}`;
-    url += queryStringUrl?.typeFood
-      ? `&typeFood=${queryStringUrl?.typeFood}`
+    url += queryStringSearch?.typeFood
+      ? `&typeFood=${queryStringSearch?.typeFood}`
       : "";
-    url += queryStringUrl?.q ? `&q=${queryStringUrl?.q}` : "";
+    url += queryStringSearch?.q ? `&q=${queryStringSearch?.q}` : "";
     fetch(url)
       .then((response) => {
         const totalItems = Number(response.headers.get("x-total-count"));
@@ -135,12 +131,14 @@ export default function ClientFoods() {
   const handleToggleToast = () => setIsToggleToast(!isToggleToast);
   function changeMenuFilter(food: ITypeFoods) {
     setItemMenuActive(food);
-
-    const url: IQueryStringUrlSearch = {
-      q: textSearch,
+    setPaginateTable((prevState: IPaginateTableFoods) => ({
+      ...prevState,
+      page: 1,
+    }));
+    setQueryStringSearch((prevState: IQueryStringUrlSearch) => ({
+      ...prevState,
       typeFood: String(food.value),
-    };
-    setQueryStringUrl(url, { replace: true });
+    }));
   }
   return (
     <Container>
@@ -156,7 +154,12 @@ export default function ClientFoods() {
             <Col md={6}>
               <Form.Control
                 placeholder="Nhập tìm kiếm"
-                onChange={(e) => setTextSearch(e.target.value)}
+                onChange={(e) =>
+                  setQueryStringSearch((prevState: IQueryStringUrlSearch) => ({
+                    ...prevState,
+                    q: e.target.value,
+                  }))
+                }
                 type="text"
               />
             </Col>
