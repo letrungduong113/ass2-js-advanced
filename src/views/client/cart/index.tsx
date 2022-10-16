@@ -66,6 +66,10 @@ const Cart = () => {
     currentProduct: TProductsInCart,
     isAdd: boolean = false
   ) {
+    if (currentProduct.amount < 2 && !isAdd) {
+      handleShowModal(currentProduct.id);
+      return;
+    }
     currentProduct.amount = isAdd
       ? Number(currentProduct.amount) + 1
       : Number(currentProduct.amount) - 1;
@@ -116,6 +120,8 @@ const Cart = () => {
                       </div>
                       {isLoading ? (
                         <SpinnerRoundOutlined />
+                      ) : productsInCart?.length < 1 ? (
+                        <div>Không có sản phẩm nào trong giỏ hàng</div>
                       ) : (
                         productsInCart.map((item) => {
                           return (

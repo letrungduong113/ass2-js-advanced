@@ -96,88 +96,82 @@ export default function AddFood() {
   function isValidationForm(): boolean {
     let isFlag = true;
     const { nameFood, typeFood, price, amount, typeProduct } = payload;
-    if (nameFood.length < 1) {
+    if (!nameFood) {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         nameFood: "Vui lòng nhập tên món ăn",
       }));
-      isFlag = false;
     } else {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         nameFood: "",
       }));
-      isFlag = true;
     }
     if (!typeFood) {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         typeFood: "Vui lòng chọn loại món ăn",
       }));
-      isFlag = false;
     } else {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         typeFood: "",
       }));
-      isFlag = true;
     }
     if (!price) {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         price: "Vui lòng nhập thành tiền",
       }));
-      isFlag = false;
     } else {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         price: "",
       }));
-      isFlag = true;
     }
     if (!amount) {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         amount: "Vui lòng nhập số lượng",
       }));
-      isFlag = false;
     } else {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         amount: "",
       }));
-      isFlag = true;
     }
     if (!typeProduct) {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         typeProduct: "Vui lòng chọn loại sản phẩm",
       }));
-      isFlag = false;
     } else {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         typeProduct: "",
       }));
-      isFlag = true;
     }
     if (!fileUpload) {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         imgUrl: "Vui lòng upload ảnh",
       }));
-      isFlag = false;
     } else {
       setMessErrs((prevState: IMessErrors) => ({
         ...prevState,
         imgUrl: "",
       }));
-      isFlag = true;
     }
+    if (nameFood && typeFood && price && amount && typeProduct && fileUpload)
+      isFlag = true;
+    else isFlag = false;
     return isFlag;
   }
 
   function postCreateFood() {
+    payload.typeFood = Number(payload.typeFood);
+    payload.price = Number(payload.price);
+    payload.amount = Number(payload.amount);
     setIsLoadingCreate(true);
     fetch(`${API_URL_DEV}/foods`, {
       credentials: "same-origin", // 'include', default: 'omit'
@@ -289,7 +283,7 @@ export default function AddFood() {
                                     setPayload(
                                       (prevState: IPayloadCreateFood) => ({
                                         ...prevState,
-                                        typeFood: Number(e.target.value),
+                                        typeFood: e.target.value,
                                       })
                                     )
                                   }
@@ -314,7 +308,7 @@ export default function AddFood() {
                                     setPayload(
                                       (prevState: IPayloadCreateFood) => ({
                                         ...prevState,
-                                        price: parseFloat(e.target.value),
+                                        price: e.target.value,
                                       })
                                     )
                                   }
@@ -331,7 +325,7 @@ export default function AddFood() {
                                     setPayload(
                                       (prevState: IPayloadCreateFood) => ({
                                         ...prevState,
-                                        amount: Number(e.target.value),
+                                        amount: e.target.value,
                                       })
                                     )
                                   }
