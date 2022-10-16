@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { SpinnerRoundOutlined } from "spinners-react";
+import ModalComponent from "../../../components/modal";
 import ToastComponent from "../../../components/toast";
 import { API_URL_DEV } from "../../../env/environment.dev";
 import { TProductsInCart } from "../../../model/client.model";
@@ -10,6 +12,9 @@ const Cart = () => {
   const [descriptionToast, setDescriptionToast] = useState<string>("");
   const [isToggleToast, setIsToggleToast] = useState<boolean>(false);
   const [productsInCart, setProductsInCart] = useState<TProductsInCart[]>([]);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [isToggleModal, setIsToggleModal] = useState<boolean>(false);
+  const [idProduct, setIdProduct] = useState<number | null>(null);
   useEffect(() => {
     fetchProductsInCart();
   }, []);
@@ -20,12 +25,62 @@ const Cart = () => {
       .then((response) => response.json())
       .then((data: TProductsInCart[]) => {
         setIsLoading(false);
+        let totalPrice = 0;
+        for (let i = 0; i < data.length; i++) {
+          totalPrice += Number(data[i].price) * Number(data[i].amount);
+        }
+        setTotalPrice(totalPrice);
         setProductsInCart(data);
       })
       .catch((error) => {
         setDescriptionToast("Đã xảy ra lỗi");
         handleToggleToast();
         setIsLoading(false);
+      });
+  }
+  const handleCloseModal = () => setIsToggleModal(false);
+  const handleShowModal = (id: number) => {
+    setIdProduct(id);
+    setIsToggleModal(true);
+  };
+  const handleConfirmDelete = () => {
+    setIsLoading(true);
+    fetch(`${API_URL_DEV}/carts/${idProduct}`, {
+      credentials: "same-origin", // 'include', default: 'omit'
+      method: "DELETE", // 'GET', 'PUT', 'DELETE', etc.
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setIsLoading(false);
+        setDescriptionToast("Xoá thành công");
+        handleToggleToast();
+        handleCloseModal();
+        fetchProductsInCart();
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsLoading(false);
+      });
+  };
+  function updateProductInCart(
+    currentProduct: TProductsInCart,
+    isAdd: boolean = false
+  ) {
+    currentProduct.amount = isAdd
+      ? Number(currentProduct.amount) + 1
+      : Number(currentProduct.amount) - 1;
+    fetch(`${API_URL_DEV}/carts/${currentProduct.id}`, {
+      credentials: "same-origin",
+      method: "PUT", // 'GET', 'PUT', 'DELETE', etc.
+      body: JSON.stringify(currentProduct),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        fetchProductsInCart();
+      })
+      .catch((error) => {
+        console.error(error);
       });
   }
   const handleToggleToast = () => setIsToggleToast(!isToggleToast);
@@ -35,6 +90,12 @@ const Cart = () => {
         description={descriptionToast}
         isToggle={isToggleToast}
         handleToggle={handleToggleToast}
+      />
+      <ModalComponent
+        description="Bạn có muốn chắc chắn xoá sản phẩm này khỏi giỏ hàng?"
+        show={isToggleModal}
+        handleClose={handleCloseModal}
+        handleConfirm={handleConfirmDelete}
       />
       <div className="container py-5 h-100">
         <div className="row d-flex justify-content-center align-items-center h-100">
@@ -58,7 +119,7 @@ const Cart = () => {
                       ) : (
                         productsInCart.map((item) => {
                           return (
-                            <div>
+                            <div key={item.id}>
                               <hr className="my-4"></hr>
 
                               <div className="row mb-4 d-flex justify-content-between align-items-center">
@@ -75,19 +136,28 @@ const Cart = () => {
                                   </h6>
                                 </div>
                                 <div className="col-md-3 col-lg-3 col-xl-2 d-flex">
-                                  <button className="btn btn-link px-2">
+                                  <button
+                                    onClick={() =>
+                                      updateProductInCart(item, false)
+                                    }
+                                    className="btn btn-link px-2"
+                                  >
                                     <i className="fas fa-minus"></i>
                                   </button>
 
                                   <input
                                     min="0"
-                                    name="quantity"
                                     value={item.amount}
                                     type="number"
                                     className="form-control form-control-sm"
                                   />
 
-                                  <button className="btn btn-link px-2">
+                                  <button
+                                    onClick={() =>
+                                      updateProductInCart(item, true)
+                                    }
+                                    className="btn btn-link px-2"
+                                  >
                                     <i className="fas fa-plus"></i>
                                   </button>
                                 </div>
@@ -97,9 +167,12 @@ const Cart = () => {
                                   </h6>
                                 </div>
                                 <div className="col-md-1 col-lg-1 col-xl-1 text-end">
-                                  <a href="#!" className="text-muted">
+                                  <div
+                                    onClick={(e) => handleShowModal(item.id)}
+                                    className="text-muted cursor-pointer"
+                                  >
                                     <i className="fas fa-times"></i>
-                                  </a>
+                                  </div>
                                 </div>
                               </div>
                               <hr className="my-4"></hr>
@@ -110,10 +183,10 @@ const Cart = () => {
 
                       <div className="pt-5">
                         <h6 className="mb-0">
-                          <a href="#!" className="text-body">
+                          <Link to="/" className="text-body">
                             <i className="fas fa-long-arrow-alt-left me-2"></i>
                             Trở về trang chủ
-                          </a>
+                          </Link>
                         </h6>
                       </div>
                     </div>
@@ -123,37 +196,12 @@ const Cart = () => {
                       <h3 className="fw-bold mb-5 mt-2 pt-1">
                         Chi tiêt đơn hàng
                       </h3>
-                      <hr className="my-4"></hr>
-
-                      <h5 className="text-uppercase mb-3">Shipping</h5>
-
-                      <div className="mb-4 pb-2">
-                        <select className="select">
-                          <option value="1">Standard-Delivery- €5.00</option>
-                          <option value="2">Two</option>
-                          <option value="3">Three</option>
-                          <option value="4">Four</option>
-                        </select>
-                      </div>
-
-                      <h5 className="text-uppercase mb-3">Give code</h5>
-
-                      <div className="mb-5">
-                        <div className="form-outline">
-                          <input
-                            type="text"
-                            id="form3Examplea2"
-                            className="form-control form-control-lg"
-                          />
-                          <label className="form-label">Enter your code</label>
-                        </div>
-                      </div>
 
                       <hr className="my-4"></hr>
 
                       <div className="d-flex justify-content-between mb-5">
                         <h5 className="text-uppercase">Tổng tiền</h5>
-                        <h5>€ 137.00</h5>
+                        <h5>{formatCurrencyVND(totalPrice)}</h5>
                       </div>
 
                       <button
