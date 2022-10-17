@@ -99,7 +99,7 @@ export default function ClientFoods() {
     }
 
     function handleSearch() {
-        if (queryStringSearch.q) fetchListFoods();
+        fetchListFoods();
     }
 
     useEffect(() => {
