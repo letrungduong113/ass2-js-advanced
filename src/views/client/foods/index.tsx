@@ -343,7 +343,7 @@ export default function ClientFoods() {
                     })
                 )}
 
-                <Col md={12} className="cart">
+                <Col md={2} className="cart">
                     <Link to="/cart">
                         <img className="img-cart" src={cart}/>
                     </Link>
